@@ -39,10 +39,10 @@ switch ($method) {
         // Create new student
         $data = json_decode(file_get_contents("php://input"), true);
         
-        if (!empty($data['judul']) && !empty($data['penerbit']) && !empty($data['pengarang'] && !empty($data['thn_terbit']))) {
-            $stmt = $pdo->prepare("INSERT INTO buku (judul, penerbit, pengarang, thn_terbit) VALUES (?, ?, ?, ?)");
-            $stmt->execute([$data['judul'], $data['penerbit'], $data['pengarang'], $data['thn_terbit']]);
-            echo json_encode(["message" => "Student created", "id" => $pdo->lastInsertId()]);
+        if (!empty($data['kode_buku']) && !empty($data['judul']) && !empty($data['penerbit']) && !empty($data['pengarang'] && !empty($data['thn_terbit']))) {
+            $stmt = $pdo->prepare("INSERT INTO buku (kode_buku,judul, penerbit, pengarang, thn_terbit) VALUES (?, ?, ?, ?, ?)");
+            $stmt->execute([$data['kode_buku'], $data['judul'], $data['penerbit'], $data['pengarang'], $data['thn_terbit']]);
+            echo json_encode(["message" => "Buku created", "id" => $pdo->lastInsertId()]);
         } else {
             http_response_code(400);
             echo json_encode(["message" => "Invalid data"]);
@@ -59,13 +59,14 @@ switch ($method) {
             $buku = $stmt->fetch(PDO::FETCH_ASSOC);
             
             if ($buku) {
+                $kode_buku = $data['kode_buku'] ?? $buku['kode_buku'];
                 $judul = $data['judul'] ?? $buku['judul'];
                 $penerbit = $data['penerbit'] ?? $buku['penerbit'];
                 $pengarang = $data['pengarang'] ?? $buku['pengarang'];
                 $thn_terbit = $data['thn_terbit'] ?? $buku['thn_terbit'];
                 
-                $stmt = $pdo->prepare("UPDATE buku SET judul = ?, penerbit = ?, pengarang = ? , thn_terbit = ? WHERE id = ?");
-                $stmt->execute([$judul, $penerbit, $pengarang, $thn_terbit, $id]);
+                $stmt = $pdo->prepare("UPDATE buku SET  kode_buku = ?, judul = ?, penerbit = ?, pengarang = ? , thn_terbit = ? WHERE id = ?");
+                $stmt->execute([$kode_buku,$judul, $penerbit, $pengarang, $thn_terbit, $id]);
                 echo json_encode(["message" => "buku updated"]);
             } else {
                 http_response_code(404);
